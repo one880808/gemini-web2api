@@ -35,7 +35,7 @@
  * 时才会真正路由到 Pro,否则回退到 Flash。
  */
 
-const VERSION = "1.1.0-worker";
+const VERSION = "1.1.1-worker";
 
 // ════════════════════════════════════════════════════════════════════════════
 //  CONFIG —— 改这些值,然后直接部署本文件。
@@ -55,7 +55,9 @@ const CONFIG = {
 
   // Gemini 网页版构建号。如果返回开始变空,去 gemini.google.com 页面源码里
   // 找一个新的值("boq_assistant-bard-web-server_...")。
-  GEMINI_BL: "boq_assistant-bard-web-server_20260525.09_p0",
+  // Upstream: Sophomoresty/gemini-web2api@fbd5dde (update gemini_bl to 20260716.08_p0)
+  // https://github.com/Sophomoresty/gemini-web2api/commit/fbd5ddefcf9423575d0d9bede9b4a2ae994d1464
+  GEMINI_BL: "boq_assistant-bard-web-server_20260716.08_p0",
 
   // 上游源站。默认直连 gemini.google.com。若部署在 Cloudflare/无服务器平台
   // 被 Google 以 429 限流(出口 IP 被拦),把它指向一个跑在“干净 IP”上的反向
@@ -67,7 +69,9 @@ const CONFIG = {
   // true=优先 socket,不可用/失败再回退 fetch;false=只用 fetch。
   UPSTREAM_SOCKET: true,
 
-  DEFAULT_MODEL: "gemini-3.5-flash",
+  // Upstream: Sophomoresty/gemini-web2api@d227668 (Google mode 1 now serves 3.6 Flash)
+  // https://github.com/Sophomoresty/gemini-web2api/commit/d227668e4e53a819ab0e42b8b7da1d912d3c8438
+  DEFAULT_MODEL: "gemini-3.6-flash",
   RETRY_ATTEMPTS: 3,
   RETRY_DELAY_SEC: 2,
   REQUEST_TIMEOUT_SEC: 180,
@@ -77,8 +81,12 @@ const CONFIG = {
 // ─── 模型 ────────────────────────────────────────────────────────────────
 // MODE_CATEGORY 枚举(来自 Gemini 前端 JS):
 //   1=FAST, 2=THINKING, 3=PRO, 4=AUTO, 5=FAST_DYNAMIC_THINKING, 6=FLASH_LITE
+// Upstream models list: Sophomoresty/gemini-web2api@d227668 / @e12c4ef
+// https://github.com/Sophomoresty/gemini-web2api/commit/d227668e4e53a819ab0e42b8b7da1d912d3c8438
+// https://github.com/Sophomoresty/gemini-web2api/commit/e12c4ef3548db63c7381449aa00101fb65fae08e
 const MODELS = {
-  "gemini-3.5-flash": { mode: 1, think: 4, desc: "Fast general-purpose model" },
+  "gemini-3.6-flash": { mode: 1, think: 4, desc: "Latest all-around model (Gemini 3.6 Flash)" },
+  "gemini-3.5-flash": { mode: 1, think: 4, desc: "Alias for gemini-3.6-flash (backend upgraded)" },
   "gemini-3.5-flash-thinking": { mode: 2, think: 0, desc: "Deep thinking mode, longest output (~20k chars)" },
   "gemini-3.1-pro": { mode: 3, think: 4, desc: "Pro model (requires cookie for real routing)" },
   "gemini-3.1-pro-enhanced": { mode: 3, think: 4, extra: { 31: 2, 80: 3 }, desc: "Pro with enhanced output (experimental)" },
